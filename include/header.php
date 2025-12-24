@@ -135,15 +135,53 @@
         </div>
 
         <div id="mobile-menu"
-            class="hidden md:hidden bg-white/95 backdrop-blur-md border-t h-screen absolute w-full left-0 top-full">
-            <div class="p-4 space-y-3">
+            class="hidden md:hidden bg-white/95 backdrop-blur-md border-t h-screen absolute w-full left-0 top-full overflow-y-auto pb-32 transition-all">
+            <div class="p-4 flex flex-col space-y-2">
+
                 <a href="index.php" class="block px-4 py-3 font-bold text-blue-600 bg-blue-50 rounded-lg">Beranda</a>
-                <a href="#berita"
-                    class="block px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Berita</a>
+
+                <details class="group rounded-lg">
+                    <summary
+                        class="list-none flex justify-between items-center cursor-pointer px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition select-none">
+                        <span>Berita</span>
+                        <i
+                            class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="pl-4 pr-2 py-2 space-y-1 bg-gray-50/50 rounded-b-lg">
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Semua
+                            Berita</a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Berita
+                            Umum</a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Berita
+                            Mahasiswa</a>
+                    </div>
+                </details>
+
+                <details class="group rounded-lg">
+                    <summary
+                        class="list-none flex justify-between items-center cursor-pointer px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition select-none">
+                        <span>Profil</span>
+                        <i
+                            class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="pl-4 pr-2 py-2 space-y-1 bg-gray-50/50 rounded-b-lg">
+                        <a href="#profil"
+                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Tentang
+                            HIMASI</a>
+                        <a href="#visimisi"
+                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Visi
+                            & Misi</a>
+                        <a href="#"
+                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Struktur
+                            Organisasi</a>
+                    </div>
+                </details>
+
                 <a href="#agenda"
-                    class="block px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Agenda</a>
-                <a href="#profil"
-                    class="block px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 rounded-lg">Profil</a>
+                    class="block px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">Agenda</a>
             </div>
         </div>
     </nav>
