@@ -3,12 +3,13 @@ include '../../include/header.php';
 include '../../include/koneksi.php';
 
 // Cek apakah ada ID yang dikirim
-if (!isset($_GET['id'])) {
+$id = isset($_GET['id']) ? $_GET['id'] : '';
+if (!$id) {
     header("Location: index.php");
     exit;
 }
 
-$id = $_GET['id'];
+// Ambil data lama dari database
 $query = mysqli_query($koneksi, "SELECT * FROM berita WHERE id = '$id'");
 $data = mysqli_fetch_assoc($query);
 
@@ -31,7 +32,7 @@ if (mysqli_num_rows($query) < 1) {
                     <span class="text-blue-600 font-semibold">Edit Berita</span>
                 </div>
                 <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">
-                    Edit Artikel
+                    Edit Artikel & Berita
                 </h1>
             </div>
             
@@ -57,7 +58,7 @@ if (mysqli_num_rows($query) < 1) {
                             <input type="text" name="judul" value="<?php echo $data['judul']; ?>" class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition" required>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Kategori <span class="text-red-500">*</span></label>
                                 <div class="relative">
@@ -72,19 +73,6 @@ if (mysqli_num_rows($query) < 1) {
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Status</label>
-                                <div class="relative">
-                                    <select name="status" class="w-full pl-5 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition appearance-none cursor-pointer">
-                                        <option value="published" <?php if($data['status'] == 'published') echo 'selected'; ?>>Published (Tayang)</option>
-                                        <option value="draft" <?php if($data['status'] == 'draft') echo 'selected'; ?>>Draft (Disimpan)</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                                        <i class="fas fa-chevron-down text-xs"></i>
-                                    </div>
-                                </div>
-                            </div>
 
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Terbit <span class="text-red-500">*</span></label>
@@ -93,32 +81,44 @@ if (mysqli_num_rows($query) < 1) {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Gambar Sampul</label>
-                            
-                            <?php if($data['gambar'] != "") { ?>
-                                <div class="mb-4">
-                                    <p class="text-xs text-gray-500 mb-1">Gambar saat ini:</p>
-                                    <img src="../../assets/uploads/berita/<?php echo $data['gambar']; ?>" class="h-32 rounded-lg border border-gray-200 p-1">
-                                </div>
-                            <?php } ?>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Status Publikasi</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="status" value="published" class="w-5 h-5 text-blue-600" <?php if($data['status'] == 'published') echo 'checked'; ?>>
+                                    <span class="text-sm text-gray-700 font-medium">Published (Tayang)</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="status" value="draft" class="w-5 h-5 text-blue-600" <?php if($data['status'] == 'draft') echo 'checked'; ?>>
+                                    <span class="text-sm text-gray-700 font-medium">Draft (Sembunyikan)</span>
+                                </label>
+                            </div>
+                        </div>
 
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Gambar Artikel</label>
                             <div class="flex items-center justify-center w-full">
-                                <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-2xl cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400 transition group">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                        <div id="upload-placeholder">
-                                            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2 group-hover:text-blue-500 transition"></i>
-                                            <p class="mb-1 text-sm text-gray-500"><span class="font-semibold text-blue-600">Klik untuk ganti gambar</span> (Opsional)</p>
-                                            <p class="text-xs text-gray-400">Biarkan kosong jika tidak ingin mengganti gambar.</p>
+                                <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-2xl cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400 transition group overflow-hidden relative">
+                                    
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4 z-10">
+                                        
+                                        <img id="preview-image" src="../../assets/uploads/berita/<?php echo $data['gambar']; ?>" 
+                                             class="<?php echo ($data['gambar'] == '') ? 'hidden' : ''; ?> h-48 object-contain mb-3 rounded-lg shadow-sm" />
+
+                                        <div id="upload-placeholder" class="<?php echo ($data['gambar'] != '') ? 'hidden' : ''; ?>">
+                                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3 group-hover:text-blue-500 transition"></i>
+                                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold text-blue-600">Klik untuk ganti gambar</span></p>
+                                            <p class="text-xs text-gray-400">Biarkan jika tidak ingin mengubah</p>
                                         </div>
                                     </div>
-                                    <input id="dropzone-file" type="file" name="gambar" class="hidden" accept="image/*" />
+
+                                    <input id="dropzone-file" type="file" name="gambar" class="hidden" accept="image/*" onchange="previewFile()" />
                                 </label>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Isi Konten <span class="text-red-500">*</span></label>
-                            <textarea name="isi" rows="12" class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition leading-relaxed" required><?php echo $data['isi']; ?></textarea>
+                            <textarea name="isi" rows="12" class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition leading-relaxed" placeholder="Tuliskan isi berita..." required><?php echo $data['isi']; ?></textarea>
                         </div>
 
                         <div class="pt-6 border-t border-gray-100 flex items-center gap-4">
@@ -134,5 +134,25 @@ if (mysqli_num_rows($query) < 1) {
         </div>
     </div>
 </div>
+
+<script>
+function previewFile() {
+    const preview = document.getElementById('preview-image');
+    const placeholder = document.getElementById('upload-placeholder');
+    const file = document.querySelector('input[type=file]').files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener("load", function () {
+        // Ganti src gambar dengan gambar baru yang dipilih
+        preview.src = reader.result;
+        preview.classList.remove('hidden'); // Tampilkan gambar
+        placeholder.classList.add('hidden'); // Sembunyikan placeholder icon
+    }, false);
+
+    if (file) {
+        reader.readAsDataURL(file);
+    }
+}
+</script>
 
 <?php include '../../include/footer.php'; ?>
