@@ -1,5 +1,14 @@
 <?php
 include '../../include/header.php';
+include '../../include/koneksi.php';
+
+$id = $_GET['id'];
+$query = mysqli_query($koneksi, "SELECT * FROM profil WHERE id='$id'");
+$d = mysqli_fetch_assoc($query);
+
+if (mysqli_num_rows($query) < 1) {
+    echo "<script>alert('Data tidak ditemukan');window.location='index.php';</script>";
+}
 ?>
 
 <div class="pt-24 pb-10 bg-blue-50/50 border-b border-gray-200">
@@ -11,11 +20,9 @@ include '../../include/header.php';
                     <i class="fas fa-chevron-right text-[10px]"></i>
                     <a href="index.php" class="hover:text-blue-600 transition">Profil</a>
                     <i class="fas fa-chevron-right text-[10px]"></i>
-                    <span class="text-blue-600 font-semibold">Tambah</span>
+                    <span class="text-blue-600 font-semibold">Edit</span>
                 </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">
-                    Tambah Bagian Profil
-                </h1>
+                <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">Edit Bagian Profil</h1>
             </div>
 
             <a href="index.php"
@@ -32,38 +39,40 @@ include '../../include/header.php';
 
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                 <div class="p-8 md:p-10">
-                    <form action="proses_tambah.php" method="POST" enctype="multipart/form-data" class="space-y-8">
+                    <form action="proses_edit.php" method="POST" enctype="multipart/form-data" class="space-y-8">
+                        <input type="hidden" name="id" value="<?php echo $d['id']; ?>">
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Judul Bagian <span
                                         class="text-red-500">*</span></label>
-                                <input type="text" name="judul"
-                                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition placeholder-gray-400"
-                                    placeholder="Contoh: Visi & Misi, Sejarah Singkat" required>
+                                <input type="text" name="judul" value="<?php echo $d['judul_bagian']; ?>"
+                                    class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                    required>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-2">Urutan Tampil</label>
-                                <input type="number" name="urutan"
+                                <input type="number" name="urutan" value="<?php echo $d['urutan']; ?>"
                                     class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                    placeholder="1" value="1" required>
-                                <p class="text-[10px] text-gray-400 mt-1">Angka kecil tampil duluan.</p>
+                                    required>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Gambar Pendukung
-                                (Opsional)</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Gambar Pendukung</label>
                             <div class="flex items-center justify-center w-full">
                                 <label for="dropzone-file"
                                     class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-2xl cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400 transition group relative overflow-hidden">
                                     <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                                        <img id="preview-image"
-                                            class="hidden h-32 object-contain mb-3 rounded-lg z-10" />
-                                        <div id="upload-placeholder">
+                                        <?php $imgSrc = ($d['gambar'] != "") ? "../../assets/uploads/profil/" . $d['gambar'] : ""; ?>
+                                        <img id="preview-image" src="<?php echo $imgSrc; ?>"
+                                            class="<?php echo ($imgSrc == "") ? 'hidden' : ''; ?> h-32 object-contain mb-3 rounded-lg z-10" />
+
+                                        <div id="upload-placeholder"
+                                            class="<?php echo ($imgSrc != "") ? 'hidden' : ''; ?>">
                                             <i
                                                 class="fas fa-image text-3xl text-gray-400 mb-3 group-hover:text-blue-500 transition"></i>
-                                            <p class="mb-1 text-sm text-gray-500">Klik untuk upload gambar</p>
+                                            <p class="mb-1 text-sm text-gray-500">Klik untuk ganti gambar</p>
                                         </div>
                                     </div>
                                     <input id="dropzone-file" type="file" name="gambar" class="hidden" accept="image/*"
@@ -77,13 +86,13 @@ include '../../include/header.php';
                                     class="text-red-500">*</span></label>
                             <textarea name="isi_konten" rows="10"
                                 class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition leading-relaxed"
-                                placeholder="Tuliskan isi profil di sini..." required></textarea>
+                                required><?php echo $d['isi_konten']; ?></textarea>
                         </div>
 
                         <div class="pt-6 border-t border-gray-100 flex items-center gap-4">
-                            <button type="submit" name="simpan"
-                                class="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition w-full md:w-auto">
-                                <i class="fas fa-save mr-2"></i> Simpan Profil
+                            <button type="submit" name="update"
+                                class="px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition w-full md:w-auto">
+                                <i class="fas fa-save mr-2"></i> Simpan Perubahan
                             </button>
                         </div>
 

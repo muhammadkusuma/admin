@@ -1,6 +1,9 @@
 <?php
-// Pastikan path include header benar
 include '../../include/header.php';
+include '../../include/koneksi.php';
+
+// Ambil data profil urutkan berdasarkan urutan terkecil
+$query = mysqli_query($koneksi, "SELECT * FROM profil ORDER BY urutan ASC");
 ?>
 
 <div class="pt-24 pb-10 bg-blue-50/50 border-b border-gray-200">
@@ -51,100 +54,55 @@ include '../../include/header.php';
                     </thead>
                     <tbody class="divide-y divide-gray-100">
 
-                        <tr class="hover:bg-blue-50/30 transition duration-200">
-                            <td class="px-6 py-4 text-center font-bold text-gray-400">#1</td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-gray-900">Visi & Misi</div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                Menjadikan HIMASI sebagai wadah aspirasi mahasis...
-                            </td>
-                            <td class="px-6 py-4">
-                                <div
-                                    class="w-16 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                20 Des 2024 10:00
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <button
-                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"
-                                        title="Edit">
-                                        <i class="fas fa-pencil-alt text-xs"></i>
-                                    </button>
-                                    <button
-                                        class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition"
-                                        title="Hapus">
-                                        <i class="fas fa-trash text-xs"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-blue-50/30 transition duration-200">
-                            <td class="px-6 py-4 text-center font-bold text-gray-400">#2</td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-gray-900">Sejarah Singkat</div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                Berdiri sejak tahun 2002, Jurusan Sistem Informa...
-                            </td>
-                            <td class="px-6 py-4">
-                                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80"
-                                    class="w-16 h-10 object-cover rounded-lg border border-gray-200" alt="Img">
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                22 Des 2024 08:30
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <button
-                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"
-                                        title="Edit">
-                                        <i class="fas fa-pencil-alt text-xs"></i>
-                                    </button>
-                                    <button
-                                        class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition"
-                                        title="Hapus">
-                                        <i class="fas fa-trash text-xs"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-blue-50/30 transition duration-200">
-                            <td class="px-6 py-4 text-center font-bold text-gray-400">#3</td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-gray-900">Sambutan Bupati</div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                                Assalamu’alaikum Warahmatullahi Wabarakatuh...
-                            </td>
-                            <td class="px-6 py-4">
-                                <img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80"
-                                    class="w-16 h-10 object-cover rounded-lg border border-gray-200" alt="Img">
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
-                                24 Des 2024 14:15
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <button
-                                        class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"
-                                        title="Edit">
-                                        <i class="fas fa-pencil-alt text-xs"></i>
-                                    </button>
-                                    <button
-                                        class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition"
-                                        title="Hapus">
-                                        <i class="fas fa-trash text-xs"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        <?php
+                        if (mysqli_num_rows($query) > 0) {
+                            while ($d = mysqli_fetch_array($query)) {
+                                ?>
+                                <tr class="hover:bg-blue-50/30 transition duration-200">
+                                    <td class="px-6 py-4 text-center font-bold text-gray-400">#<?php echo $d['urutan']; ?></td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-bold text-gray-900"><?php echo $d['judul_bagian']; ?></div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                                        <?php echo substr(strip_tags($d['isi_konten']), 0, 50) . '...'; ?>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <?php if ($d['gambar'] != "") { ?>
+                                            <img src="../../assets/uploads/profil/<?php echo $d['gambar']; ?>"
+                                                class="w-16 h-10 object-cover rounded-lg border border-gray-200" alt="Img">
+                                        <?php } else { ?>
+                                            <div
+                                                class="w-16 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        <?php } ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        <?php echo date('d M Y H:i', strtotime($d['updated_at'])); ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a href="edit.php?id=<?php echo $d['id']; ?>"
+                                                class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition"
+                                                title="Edit">
+                                                <i class="fas fa-pencil-alt text-xs"></i>
+                                            </a>
+                                            <a href="proses_hapus.php?id=<?php echo $d['id']; ?>"
+                                                class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition"
+                                                title="Hapus" onclick="return confirm('Hapus bagian ini?')">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                        } else {
+                            ?>
+                            <tr>
+                                <td colspan="6" class="text-center py-6 text-gray-500">Belum ada data profil.</td>
+                            </tr>
+                        <?php } ?>
 
                     </tbody>
                 </table>
