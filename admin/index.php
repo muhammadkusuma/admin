@@ -4,10 +4,30 @@ session_start();
 // Cek apakah user sudah login
 if ($_SESSION['status'] != "login") {
     header("location:../login.php?pesan=belum_login");
-    exit; // Pastikan kode di bawahnya tidak dieksekusi
+    exit;
 }
 
 include '../include/header.php';
+include '../include/koneksi.php';
+
+// --- LOGIKA MENGHITUNG JUMLAH DATA ---
+
+// 1. Hitung Total Berita
+$query_berita = mysqli_query($koneksi, "SELECT id FROM berita");
+$jml_berita = mysqli_num_rows($query_berita);
+
+// 2. Hitung Total Anggota
+$query_anggota = mysqli_query($koneksi, "SELECT id FROM anggota");
+$jml_anggota = mysqli_num_rows($query_anggota);
+
+// 3. Hitung Total Acara
+$query_acara = mysqli_query($koneksi, "SELECT id FROM acara");
+$jml_acara = mysqli_num_rows($query_acara);
+
+// (Opsional) Ambil data user yang sedang login untuk foto profil
+$id_user = $_SESSION['id_anggota'];
+$query_user = mysqli_query($koneksi, "SELECT * FROM anggota WHERE id='$id_user'");
+$user_login = mysqli_fetch_assoc($query_user);
 ?>
 
 <div class="pt-24 pb-12 bg-blue-50/50 border-b border-gray-200">
@@ -16,16 +36,25 @@ include '../include/header.php';
             <div class="flex items-center gap-6">
                 <div
                     class="w-20 h-20 rounded-full bg-blue-200 border-4 border-white shadow-lg overflow-hidden flex-shrink-0">
-                    <img src="https://ui-avatars.com/api/?name=Admin+HIMASI&background=0D8ABC&color=fff"
-                        alt="Admin Profile" class="w-full h-full object-cover">
+                    <?php
+                    // Cek foto user login
+                    $foto_profil = (isset($user_login['foto']) && $user_login['foto'] != "" && $user_login['foto'] != "default.jpg")
+                        ? "../assets/uploads/anggota/" . $user_login['foto']
+                        : "https://ui-avatars.com/api/?name=" . urlencode($_SESSION['nama']) . "&background=0D8ABC&color=fff";
+                    ?>
+                    <img src="<?php echo $foto_profil; ?>" alt="Admin Profile" class="w-full h-full object-cover">
                 </div>
+
                 <div>
                     <span
-                        class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider mb-2">Administrator</span>
+                        class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
+                        <?php echo $_SESSION['role']; ?>
+                    </span>
                     <h1 class="text-3xl font-extrabold text-gray-900 leading-none">
-                        Halo, Admin! </h1>
-                    <p class="text-gray-500 mt-2 text-sm md:text-base">Selamat datang kembali di panel kontrol HIMASI
-                        (Mode Statis).</p>
+                        Halo, <?php echo $_SESSION['nama']; ?>!
+                    </h1>
+                    <p class="text-gray-500 mt-2 text-sm md:text-base">Selamat datang kembali di panel kontrol HIMASI.
+                    </p>
                 </div>
             </div>
 
@@ -53,7 +82,9 @@ include '../include/header.php';
                         <i class="far fa-newspaper"></i>
                     </div>
                     <h3 class="text-gray-500 font-bold text-sm uppercase tracking-wider">Total Berita</h3>
-                    <p class="text-4xl font-extrabold text-gray-900 mt-1">12</p>
+
+                    <p class="text-4xl font-extrabold text-gray-900 mt-1"><?php echo $jml_berita; ?></p>
+
                     <a href="berita/index.php"
                         class="inline-block mt-4 text-sm font-bold text-blue-600 hover:underline">Kelola Berita
                         &rarr;</a>
@@ -70,8 +101,10 @@ include '../include/header.php';
                         class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 text-2xl mb-4">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3 class="text-gray-500 font-bold text-sm uppercase tracking-wider">Anggota Aktif</h3>
-                    <p class="text-4xl font-extrabold text-gray-900 mt-1">150</p>
+                    <h3 class="text-gray-500 font-bold text-sm uppercase tracking-wider">Anggota Terdaftar</h3>
+
+                    <p class="text-4xl font-extrabold text-gray-900 mt-1"><?php echo $jml_anggota; ?></p>
+
                     <a href="anggota/index.php"
                         class="inline-block mt-4 text-sm font-bold text-green-600 hover:underline">Data Anggota
                         &rarr;</a>
@@ -89,7 +122,9 @@ include '../include/header.php';
                         <i class="far fa-calendar-alt"></i>
                     </div>
                     <h3 class="text-gray-500 font-bold text-sm uppercase tracking-wider">Agenda Acara</h3>
-                    <p class="text-4xl font-extrabold text-gray-900 mt-1">5</p>
+
+                    <p class="text-4xl font-extrabold text-gray-900 mt-1"><?php echo $jml_acara; ?></p>
+
                     <a href="acara/index.php"
                         class="inline-block mt-4 text-sm font-bold text-yellow-600 hover:underline">Kelola Acara
                         &rarr;</a>
