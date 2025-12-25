@@ -1,4 +1,28 @@
 <?php 
+// 1. KONEKSI & LOGIKA DULUAN
+include 'include/koneksi.php';
+
+// Tangkap ID
+if(!isset($_GET['id'])){
+    echo "<script>window.location='index.php';</script>";
+    exit;
+}
+$id = mysqli_real_escape_string($koneksi, $_GET['id']);
+
+// Ambil Data Berita
+$query = mysqli_query($koneksi, "SELECT * FROM berita WHERE id='$id'");
+$d = mysqli_fetch_assoc($query);
+
+if(mysqli_num_rows($query) < 1){
+    echo "<script>alert('Berita tidak ditemukan!'); window.location='index.php';</script>";
+    exit;
+}
+
+// 2. SET JUDUL HALAMAN (Agar Header Dinamis)
+$page_title = $d['judul'] . " - HIMASI UIN Suska";
+
+// 3. BARU INCLUDE HEADER
+include 'include/header.php';
 include 'include/header.php'; 
 include 'include/koneksi.php';
 

@@ -1,10 +1,25 @@
+<?php
+// Pastikan koneksi database tersedia. Gunakan include_once agar tidak error jika dipanggil ganda.
+include_once __DIR__ . '/koneksi.php';
+
+// 1. QUERY MENU PROFIL (Dinamis dari database)
+$q_menu_profil = mysqli_query($koneksi, "SELECT id, judul_bagian FROM profil ORDER BY urutan ASC");
+
+// 2. QUERY KATEGORI BERITA (Ambil kategori unik yang ada di database)
+// Kita ambil kategori yang memang sudah ada beritanya dan statusnya published
+$q_menu_kategori = mysqli_query($koneksi, "SELECT DISTINCT kategori FROM berita WHERE status='published'");
+
+// Judul Halaman Dinamis
+$judul_halaman = isset($page_title) ? $page_title : "HIMASI UIN Suska Riau";
+?>
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himpunan Mahasiswa Sistem Informasi - UIN Suska Riau</title>
+    <title><?php echo $judul_halaman; ?></title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -87,42 +102,49 @@
                         class="px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 rounded-full transition">Beranda</a>
 
                     <div class="relative group">
-                        <a href="#"
-                            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 flex items-center gap-1 transition">Berita
-                            <i class="fas fa-chevron-down text-[10px] pt-1"></i></a>
+                        <button
+                            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 flex items-center gap-1 transition">
+                            Berita <i class="fas fa-chevron-down text-[10px] pt-1"></i>
+                        </button>
                         <div
                             class="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 border border-gray-100 z-50">
-                            <a href="#"
+                            <a href="index.php#berita"
                                 class="block px-5 py-2.5 text-sm font-bold text-blue-600 hover:bg-blue-50 border-b">Semua
                                 Berita</a>
-                            <a href="#"
-                                class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">Berita
-                                Umum</a>
-                            <a href="#"
-                                class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">Berita
-                                Mahasiswa</a>
+
+                            <?php
+                            // Reset pointer data jika query pernah dipakai sebelumnya
+                            mysqli_data_seek($q_menu_kategori, 0);
+                            while ($k = mysqli_fetch_array($q_menu_kategori)) {
+                                ?>
+                                <a href="index.php?kategori=<?php echo urlencode($k['kategori']); ?>#berita"
+                                    class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                                    <?php echo $k['kategori']; ?>
+                                </a>
+                            <?php } ?>
                         </div>
                     </div>
 
                     <div class="relative group">
                         <button
-                            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 flex items-center gap-1 transition">Profil
-                            <i class="fas fa-chevron-down text-[10px] pt-1"></i></button>
+                            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 flex items-center gap-1 transition">
+                            Profil <i class="fas fa-chevron-down text-[10px] pt-1"></i>
+                        </button>
                         <div
                             class="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 border border-gray-100">
-                            <a href="#profil"
-                                class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">Tentang
-                                HIMASI</a>
-                            <a href="#visimisi"
-                                class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">Visi
-                                & Misi</a>
-                            <a href="#"
-                                class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">Struktur
-                                Organisasi</a>
+                            <?php
+                            mysqli_data_seek($q_menu_profil, 0);
+                            while ($p = mysqli_fetch_array($q_menu_profil)) {
+                                ?>
+                                <a href="index.php?section_id=<?php echo $p['id']; ?>#profil-<?php echo $p['id']; ?>"
+                                    class="block px-5 py-2.5 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                                    <?php echo $p['judul_bagian']; ?>
+                                </a>
+                            <?php } ?>
                         </div>
                     </div>
 
-                    <a href="#agenda"
+                    <a href="index.php#agenda"
                         class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition">Agenda</a>
                 </div>
 
@@ -137,7 +159,6 @@
         <div id="mobile-menu"
             class="hidden md:hidden bg-white/95 backdrop-blur-md border-t h-screen absolute w-full left-0 top-full overflow-y-auto pb-32 transition-all">
             <div class="p-4 flex flex-col space-y-2">
-
                 <a href="index.php" class="block px-4 py-3 font-bold text-blue-600 bg-blue-50 rounded-lg">Beranda</a>
 
                 <details class="group rounded-lg">
@@ -148,15 +169,18 @@
                             class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-open:rotate-180"></i>
                     </summary>
                     <div class="pl-4 pr-2 py-2 space-y-1 bg-gray-50/50 rounded-b-lg">
-                        <a href="#"
-                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Semua
+                        <a href="index.php#berita"
+                            class="block px-4 py-2 text-sm text-blue-600 font-bold hover:bg-blue-50 rounded-md transition">Semua
                             Berita</a>
-                        <a href="#"
-                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Berita
-                            Umum</a>
-                        <a href="#"
-                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Berita
-                            Mahasiswa</a>
+                        <?php
+                        mysqli_data_seek($q_menu_kategori, 0);
+                        while ($k = mysqli_fetch_array($q_menu_kategori)) {
+                            ?>
+                            <a href="index.php?kategori=<?php echo urlencode($k['kategori']); ?>#berita"
+                                class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">
+                                <?php echo $k['kategori']; ?>
+                            </a>
+                        <?php } ?>
                     </div>
                 </details>
 
@@ -168,19 +192,19 @@
                             class="fas fa-chevron-down text-[10px] transition-transform duration-300 group-open:rotate-180"></i>
                     </summary>
                     <div class="pl-4 pr-2 py-2 space-y-1 bg-gray-50/50 rounded-b-lg">
-                        <a href="#profil"
-                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Tentang
-                            HIMASI</a>
-                        <a href="#visimisi"
-                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Visi
-                            & Misi</a>
-                        <a href="#"
-                            class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">Struktur
-                            Organisasi</a>
+                        <?php
+                        mysqli_data_seek($q_menu_profil, 0);
+                        while ($p = mysqli_fetch_array($q_menu_profil)) {
+                            ?>
+                            <a href="index.php#profil-<?php echo $p['id']; ?>"
+                                class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition">
+                                <?php echo $p['judul_bagian']; ?>
+                            </a>
+                        <?php } ?>
                     </div>
                 </details>
 
-                <a href="#agenda"
+                <a href="index.php#agenda"
                     class="block px-4 py-3 font-medium text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">Agenda</a>
             </div>
         </div>
