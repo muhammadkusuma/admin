@@ -1,15 +1,19 @@
 <?php
-// Konfigurasi Database
-$host       = "localhost";
-$user       = "root";     // Default user XAMPP
-$password   = "12345678";         // Default password XAMPP (kosong)
-$database   = "db_himasi"; // Nama database yang kita buat tadi
+$host = "localhost";
+$user = "root";
+$pass = "12345678";
+$db = "db_himasi"; // Sesuaikan dengan nama databasemu
 
-// Perintah untuk koneksi
-$koneksi = mysqli_connect($host, $user, $password, $database);
+$koneksi = mysqli_connect($host, $user, $pass, $db);
 
-// Cek koneksi (Opsional, untuk debugging)
 if (!$koneksi) {
-    die("Koneksi ke database gagal: " . mysqli_connect_error());
+    die("Gagal terkoneksi ke database: " . mysqli_connect_error());
 }
+
+// --- PENTING: BASE URL ---
+// Definisikan alamat utama website kamu di sini.
+// Karena kamu pakai port 8000, gunakan ini:
+$base_url = "http://localhost:8000/";
+
+// Jika nanti sudah di-hosting, ganti jadi nama domain (misal: "https://himasi.com/")
 ?>
