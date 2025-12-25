@@ -1,4 +1,26 @@
-<?php include 'include/header.php'; ?>
+<?php
+include 'include/header.php';
+include 'include/koneksi.php';
+
+// --- 1. LOGIKA MENGAMBIL DATA ---
+
+// A. Hitung Statistik
+$q_anggota = mysqli_query($koneksi, "SELECT id FROM anggota");
+$jml_anggota = mysqli_num_rows($q_anggota);
+
+$q_agenda_all = mysqli_query($koneksi, "SELECT id FROM acara");
+$jml_agenda_all = mysqli_num_rows($q_agenda_all);
+
+// B. Ambil Data Profil (Urutan pertama)
+$q_profil = mysqli_query($koneksi, "SELECT * FROM profil ORDER BY urutan ASC LIMIT 1");
+$d_profil = mysqli_fetch_assoc($q_profil);
+
+// C. Ambil 3 Agenda Terbaru (Tabel Acara)
+$q_agenda = mysqli_query($koneksi, "SELECT * FROM acara ORDER BY tanggal DESC LIMIT 3");
+
+// D. Ambil 3 Berita Terbaru (Tabel Berita) - UNTUK LINK KE DETAIL.PHP
+$q_berita = mysqli_query($koneksi, "SELECT * FROM berita WHERE status='published' ORDER BY tanggal_terbit DESC LIMIT 3");
+?>
 
 <div class="relative h-screen min-h-[600px] flex items-center justify-center bg-fixed bg-center bg-cover"
     style="background-image: url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
@@ -40,7 +62,7 @@
     <div
         class="container mx-auto max-w-5xl bg-white rounded-2xl shadow-2xl p-8 md:p-10 flex flex-wrap justify-between items-center text-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
         <div class="w-full md:w-1/3 p-4">
-            <div class="text-4xl font-extrabold text-blue-600 mb-1">150+</div>
+            <div class="text-4xl font-extrabold text-blue-600 mb-1"><?php echo $jml_anggota; ?>+</div>
             <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Mahasiswa Aktif</div>
         </div>
         <div class="w-full md:w-1/3 p-4">
@@ -48,8 +70,8 @@
             <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Divisi & Biro</div>
         </div>
         <div class="w-full md:w-1/3 p-4">
-            <div class="text-4xl font-extrabold text-cyan-500 mb-1">24</div>
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Agenda Terlaksana</div>
+            <div class="text-4xl font-extrabold text-cyan-500 mb-1"><?php echo $jml_agenda_all; ?></div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Agenda Kegiatan</div>
         </div>
     </div>
 </div>
@@ -64,21 +86,37 @@
                 <div
                     class="absolute bottom-0 -right-4 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse">
                 </div>
-                <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                    alt="Tentang HIMASI"
-                    class="relative z-10 rounded-2xl shadow-2xl rotate-3 hover:rotate-0 transition duration-500 w-full max-w-md mx-auto border-4 border-white">
+
+                <?php
+                $img_profil = "https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+                if (isset($d_profil['gambar']) && $d_profil['gambar'] != "") {
+                    $img_profil = "assets/uploads/profil/" . $d_profil['gambar'];
+                }
+                ?>
+                <img src="<?php echo $img_profil; ?>" alt="Tentang HIMASI"
+                    class="relative z-10 rounded-2xl shadow-2xl rotate-3 hover:rotate-0 transition duration-500 w-full max-w-md mx-auto border-4 border-white object-cover">
             </div>
+
             <div class="w-full md:w-1/2">
-                <h4 class="text-blue-600 font-bold uppercase tracking-widest text-sm mb-2">Tentang HIMASI</h4>
+                <h4 class="text-blue-600 font-bold uppercase tracking-widest text-sm mb-2">
+                    <?php echo isset($d_profil['judul_bagian']) ? $d_profil['judul_bagian'] : 'Tentang HIMASI'; ?>
+                </h4>
+
                 <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
                     Mengabdi dengan Hati, <br>Bergerak dengan <span
                         class="text-blue-600 underline decoration-yellow-400 decoration-4 underline-offset-4">Teknologi</span>.
                 </h2>
-                <p class="text-gray-600 text-lg leading-relaxed mb-6">
-                    Himpunan Mahasiswa Sistem Informasi (HIMASI) UIN Suska Riau berdiri sejak tahun 2002. Kami hadir
-                    sebagai rumah bagi mahasiswa untuk mengembangkan soft skill, kepemimpinan, dan kemampuan teknis di
-                    bidang IT.
-                </p>
+
+                <div class="text-gray-600 text-lg leading-relaxed mb-6">
+                    <?php
+                    if (isset($d_profil['isi_konten'])) {
+                        echo nl2br($d_profil['isi_konten']);
+                    } else {
+                        echo "Himpunan Mahasiswa Sistem Informasi (HIMASI) hadir sebagai wadah untuk mengembangkan soft skill, kepemimpinan, dan kemampuan teknis di bidang IT.";
+                    }
+                    ?>
+                </div>
+
                 <a href="#"
                     class="inline-block bg-gray-900 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-800 transition shadow-lg">
                     Lihat Struktur Pengurus Lengkap →
@@ -108,8 +146,6 @@
                 </blockquote>
                 <p class="text-gray-600 mb-8 leading-relaxed text-lg">
                     Assalamu’alaikum Warahmatullahi Wabarakatuh. Selamat datang di website resmi HIMASI UIN Suska Riau.
-                    Website ini hadir sebagai wujud transparansi, informasi, dan wadah aspirasi bagi seluruh mahasiswa
-                    Sistem Informasi.
                 </p>
             </div>
             <div class="w-full md:w-2/5 order-1 md:order-2">
@@ -130,82 +166,118 @@
     </div>
 </div>
 
-<div id="visimisi" class="py-24 bg-white relative overflow-hidden border-t border-gray-100">
-    <div class="container mx-auto px-6 relative z-10">
+<div id="berita" class="py-24 bg-white border-t border-gray-100">
+    <div class="container mx-auto px-6">
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <span class="text-blue-600 font-bold tracking-[0.2em] text-sm uppercase mb-2 block">Our Goals</span>
-            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">Visi & Misi</h2>
+            <span class="text-blue-600 font-bold tracking-[0.2em] text-sm uppercase mb-2 block">News Update</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">Berita & Artikel Terkini</h2>
+            <p class="text-gray-500 mt-4">Informasi terbaru seputar kegiatan, prestasi, dan wawasan teknologi.</p>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden mb-12 border border-gray-100">
-            <div class="flex flex-col md:flex-row">
-                <div class="w-full md:w-1/2 relative min-h-[300px]">
-                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                        alt="Foto Bersama" class="absolute inset-0 w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-blue-900/20"></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <?php
+            if (mysqli_num_rows($q_berita) > 0) {
+                while ($db = mysqli_fetch_array($q_berita)) {
+                    $tgl_berita = date('d M Y', strtotime($db['tanggal_terbit']));
+                    ?>
+                    <a href="detail.php?id=<?php echo $db['id']; ?>"
+                        class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition duration-300 flex flex-col h-full">
+                        <div class="relative h-56 overflow-hidden">
+                            <?php if ($db['gambar'] != "") { ?>
+                                <img src="assets/uploads/berita/<?php echo $db['gambar']; ?>" alt="<?php echo $db['judul']; ?>"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <?php } else { ?>
+                                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400"><i
+                                        class="fas fa-newspaper text-4xl"></i></div>
+                            <?php } ?>
+                            <div class="absolute bottom-0 left-0 bg-gradient-to-t from-black/60 to-transparent w-full p-4">
+                                <span class="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
+                                    <?php echo $db['kategori']; ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mb-3 font-medium">
+                                <i class="far fa-calendar-alt text-blue-500"></i> <?php echo $tgl_berita; ?>
+                                <span class="text-gray-300">•</span>
+                                <i class="far fa-user text-blue-500"></i> <?php echo $db['penulis']; ?>
+                            </div>
+                            <h3 class="font-bold text-xl text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition">
+                                <?php echo $db['judul']; ?>
+                            </h3>
+                            <p class="text-gray-500 text-sm line-clamp-3 mb-4 flex-grow">
+                                <?php echo substr(strip_tags($db['isi']), 0, 100); ?>...
+                            </p>
+                            <div class="text-blue-600 font-bold text-sm flex items-center gap-2 mt-auto">
+                                Baca Selengkapnya <i class="fas fa-arrow-right group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </div>
+                    </a>
+                <?php
+                }
+            } else {
+                ?>
+                <div class="col-span-3 text-center py-10">
+                    <div class="inline-block p-4 rounded-full bg-gray-50 text-gray-400 mb-3"><i
+                            class="far fa-newspaper text-4xl"></i></div>
+                    <p class="text-gray-500 italic">Belum ada berita yang dipublikasikan.</p>
                 </div>
-                <div
-                    class="w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-gradient-to-br from-white to-blue-50">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Visi Utama</h3>
-                    <p class="text-xl text-gray-600 italic leading-relaxed font-medium">
-                        "Menjadikan Himpunan Mahasiswa Sistem Informasi sebagai wadah yang unggul dalam pengembangan
-                        teknologi, berjiwa pemimpin, serta menjunjung tinggi nilai-nilai keislaman."
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition border border-gray-100 group">
-                <div
-                    class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4 group-hover:bg-blue-600 group-hover:text-white transition">
-                    <i class="fas fa-graduation-cap text-xl"></i></div>
-                <h4 class="font-bold text-lg text-gray-900 mb-2">Akademik & Riset</h4>
-                <p class="text-sm text-gray-500">Mengembangkan potensi akademik mahasiswa melalui riset teknologi.</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition border border-gray-100 group">
-                <div
-                    class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600 mb-4 group-hover:bg-yellow-500 group-hover:text-white transition">
-                    <i class="fas fa-users text-xl"></i></div>
-                <h4 class="font-bold text-lg text-gray-900 mb-2">Kepemimpinan</h4>
-                <p class="text-sm text-gray-500">Membentuk karakter pemimpin yang tangguh dan disiplin.</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition border border-gray-100 group">
-                <div
-                    class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-cyan-600 mb-4 group-hover:bg-cyan-500 group-hover:text-white transition">
-                    <i class="fas fa-hands-helping text-xl"></i></div>
-                <h4 class="font-bold text-lg text-gray-900 mb-2">Pengabdian</h4>
-                <p class="text-sm text-gray-500">Mengimplementasikan ilmu TI untuk memecahkan masalah masyarakat.</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition border border-gray-100 group">
-                <div
-                    class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4 group-hover:bg-green-500 group-hover:text-white transition">
-                    <i class="fas fa-star-and-crescent text-xl"></i></div>
-                <h4 class="font-bold text-lg text-gray-900 mb-2">Nilai Keislaman</h4>
-                <p class="text-sm text-gray-500">Menanamkan nilai-nilai keislaman dalam setiap aktivitas.</p>
-            </div>
+            <?php } ?>
         </div>
     </div>
 </div>
 
 <div id="agenda" class="py-20 bg-gray-50 border-t border-gray-100">
     <div class="container mx-auto px-6 text-center">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">Agenda & Berita</h2>
-        <p class="text-gray-500 mb-10">Kegiatan terbaru dari kami.</p>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">Agenda Kegiatan</h2>
+        <p class="text-gray-500 mb-10">Jangan lewatkan kegiatan seru dari HIMASI.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                <h3 class="font-bold text-lg">PBAK Jurusan SI 2025</h3>
-                <p class="text-gray-500 text-sm mt-2">24 Desember 2024</p>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                <h3 class="font-bold text-lg">Workshop Web Dev</h3>
-                <p class="text-gray-500 text-sm mt-2">10 Januari 2025</p>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm">
-                <h3 class="font-bold text-lg">Malam Keakraban</h3>
-                <p class="text-gray-500 text-sm mt-2">15 Februari 2025</p>
-            </div>
+            <?php
+            if (mysqli_num_rows($q_agenda) > 0) {
+                while ($da = mysqli_fetch_array($q_agenda)) {
+                    $tgl_agenda = date('d F Y', strtotime($da['tanggal']));
+                    ?>
+                    <a href="detail_acara.php?id=<?php echo $da['id']; ?>"
+                        class="group bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition text-left flex flex-col h-full border border-gray-100">
+                        <div class="mb-4 relative h-48 rounded-xl overflow-hidden">
+                            <?php if ($da['poster'] != "") { ?>
+                                <img src="assets/uploads/acara/<?php echo $da['poster']; ?>" alt="<?php echo $da['judul']; ?>"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                            <?php } else { ?>
+                                <div class="w-full h-full bg-blue-50 flex items-center justify-center text-blue-200">
+                                    <i class="fas fa-calendar-alt text-4xl"></i>
+                                </div>
+                            <?php } ?>
+                            <span
+                                class="absolute top-2 right-2 px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-bold rounded-lg text-blue-600 shadow-sm">
+                                <?php echo $da['kategori']; ?>
+                            </span>
+                        </div>
+
+                        <h3 class="font-bold text-xl text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition">
+                            <?php echo $da['judul']; ?></h3>
+                        <p class="text-gray-500 text-sm mb-4 flex items-center gap-2">
+                            <i class="far fa-clock text-blue-500"></i> <?php echo $tgl_agenda; ?>
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                <?php echo ($da['status'] == 'Akan Datang') ? 'Segera' : 'Selesai'; ?>
+                            </span>
+                            <span
+                                class="text-sm font-bold text-blue-600 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition transform translate-x-[-10px] group-hover:translate-x-0">
+                                Detail <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </a>
+                <?php
+                }
+            } else {
+                ?>
+                <div class="col-span-3 py-10">
+                    <p class="text-gray-500 italic">Belum ada agenda yang ditambahkan.</p>
+                </div>
+            <?php } ?>
         </div>
     </div>
 </div>
