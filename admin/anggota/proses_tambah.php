@@ -8,6 +8,7 @@ $angkatan   = mysqli_real_escape_string($koneksi, $_POST['angkatan']);
 $no_hp      = mysqli_real_escape_string($koneksi, $_POST['no_hp']);
 $jabatan    = mysqli_real_escape_string($koneksi, $_POST['jabatan']);
 $divisi     = mysqli_real_escape_string($koneksi, $_POST['divisi']);
+$urutan     = mysqli_real_escape_string($koneksi, $_POST['urutan']);
 
 // Set Password Default & Role
 $password   = "nim123"; // Password default
@@ -46,8 +47,8 @@ if ($filename != "") {
 }
 
 // Insert Data ke Database
-$query = "INSERT INTO anggota (nim, nama, angkatan, no_hp, jabatan, divisi, foto, password, role) 
-          VALUES ('$nim', '$nama', '$angkatan', '$no_hp', '$jabatan', '$divisi', '$nama_foto', '$password', '$role')";
+$query = "INSERT INTO anggota (nim, nama, angkatan, no_hp, jabatan, divisi, foto, password, role, urutan) 
+          VALUES ('$nim', '$nama', '$angkatan', '$no_hp', '$jabatan', '$divisi', '$nama_foto', '$password', '$role', '$urutan')";
 
 $simpan = mysqli_query($koneksi, $query);
 
