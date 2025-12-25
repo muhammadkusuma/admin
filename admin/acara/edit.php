@@ -86,7 +86,8 @@ if (mysqli_num_rows($query) < 1) {
                                 </select>
                                 <div
                                     class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                                    <i class="fas fa-chevron-down text-xs"></i></div>
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
                             </div>
                         </div>
 
@@ -104,7 +105,8 @@ if (mysqli_num_rows($query) < 1) {
                                 </select>
                                 <div
                                     class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                                    <i class="fas fa-chevron-down text-xs"></i></div>
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -129,6 +131,13 @@ if (mysqli_num_rows($query) < 1) {
                         <input type="text" name="lokasi" value="<?php echo $d['lokasi']; ?>"
                             class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                             required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Link Pendaftaran (Opsional)</label>
+                        <input type="url" name="link_pendaftaran" value="<?php echo $d['link_pendaftaran']; ?>"
+                            class="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            placeholder="https://...">
                     </div>
 
                     <div>

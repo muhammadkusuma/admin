@@ -106,14 +106,23 @@ $query_lain = mysqli_query($koneksi, "SELECT * FROM acara WHERE id != '$id' ORDE
                     <?php echo nl2br($d['deskripsi']); ?>
                 </div>
 
-                <?php if ($d['status'] == 'Akan Datang') { ?>
+                <?php
+                // Cek status acara DAN cek apakah ada link pendaftaran
+                if ($d['status'] == 'Akan Datang' && !empty($d['link_pendaftaran'])) {
+                    ?>
                     <div class="mt-10 p-8 bg-blue-50 rounded-2xl border border-blue-100 text-center">
                         <h4 class="text-xl font-bold text-blue-900 mb-2">Tertarik mengikuti acara ini?</h4>
                         <p class="text-blue-700/70 mb-6">Segera daftarkan diri kamu sebelum kuota penuh!</p>
-                        <a href="#"
+
+                        <a href="<?php echo $d['link_pendaftaran']; ?>" target="_blank"
                             class="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition transform hover:-translate-y-1">
                             Daftar Sekarang <i class="fas fa-arrow-right ml-2"></i>
                         </a>
+                    </div>
+                <?php } elseif ($d['status'] == 'Akan Datang' && empty($d['link_pendaftaran'])) { ?>
+                    <div class="mt-10 p-6 bg-yellow-50 rounded-2xl border border-yellow-100 text-center">
+                        <p class="text-yellow-800 font-medium">Info pendaftaran belum tersedia atau pendaftaran dilakukan di
+                            tempat (On The Spot).</p>
                     </div>
                 <?php } ?>
             </div>

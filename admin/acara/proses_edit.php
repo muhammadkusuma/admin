@@ -11,6 +11,7 @@ if (isset($_POST['update'])) {
     $lokasi = mysqli_real_escape_string($koneksi, $_POST['lokasi']);
     $status = mysqli_real_escape_string($koneksi, $_POST['status']);
     $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+    $link_pendaftaran = mysqli_real_escape_string($koneksi, $_POST['link_pendaftaran']);
 
     // 2. Cek apakah user mengganti poster?
     $filename = $_FILES['poster']['name'];
@@ -57,7 +58,8 @@ if (isset($_POST['update'])) {
                   lokasi='$lokasi', 
                   status='$status',
                   deskripsi='$deskripsi', 
-                  poster='$nama_poster_baru' 
+                  poster='$nama_poster_baru',
+                  link_pendaftaran='$link_pendaftaran'
                   WHERE id='$id'";
 
     } else {
@@ -70,7 +72,8 @@ if (isset($_POST['update'])) {
                   jam='$jam', 
                   lokasi='$lokasi', 
                   status='$status',
-                  deskripsi='$deskripsi'
+                  deskripsi='$deskripsi',
+                  link_pendaftaran='$link_pendaftaran'
                   WHERE id='$id'";
     }
 
